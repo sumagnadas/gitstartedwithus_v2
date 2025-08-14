@@ -61,9 +61,10 @@ const StartGame = (parent) => {
             var prevElemOffset = (sprites.length) ? (sprites[sprites.length - 1].x + sprites[sprites.length - 1].displayWidth) : 10;
 
             sprite.y = posPresets[elem.height].y - 48;
-            sprite.x = prevElemOffset + 10;
+            sprite.x = prevElemOffset + 20;
 
-            this.add.text(sprite.x, sprite.y - 24, elem.name ?? elem.id, { fontSize: '20px', fill: '#000' });
+            var text = this.add.text(sprite.x + 4, sprite.y - 24 - 3, elem.name ?? elem.id, { fontSize: '20px', fill: '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
+            text.setWordWrapCallback((txt, elem) => { if (elem.width + 10 < sprite.displayWidth) { elem.y -= 24; return txt.split(" "); } return txt; })
 
             sprite.setOrigin(0, 0);
             sprites.push(sprite)
