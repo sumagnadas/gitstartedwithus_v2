@@ -2,6 +2,8 @@ import { AUTO, Game } from 'phaser';
 import envObjects from './objects';
 
 const StartGame = (parent) => {
+    var groundLevel = 500, playerOffsetY = 50;
+    var posPresets = { 'top': { y: 100 }, 'middle': { y: 250 }, 'bottom': { y: groundLevel } }
     // var currentWidth = 800;
     var currentWidth = window.innerWidth;
     // var currentHeight = 600;
@@ -43,25 +45,29 @@ const StartGame = (parent) => {
         );
     }
 
-    var player, ground;
+    var player, ground, sprites = [];
     function create() {
         var camera = this.cameras.main;
         for (let index = 0; index < envObjects.length; index++) {
             const elem = envObjects[index];
 
-            var sprite = this.add.sprite(elem.x, elem.y, elem.id);
-
+            var sprite = this.add.sprite(0, 0, elem.id);
             sprite.displayHeight = 48; // Sets the display width to 200 pixels
             sprite.scaleX = sprite.scaleY; // Adjusts the height to maintain aspect ratio
+            var prevElemOffset = (sprites.length) ? (sprites[sprites.length - 1].x + sprites[sprites.length - 1].displayWidth) : 10;
 
-            this.add.text(elem.x - sprite.displayWidth / 2, 500 - 76, elem.name ?? elem.id, { fontSize: '20px', fill: '#000' });
+            sprite.y = posPresets[elem.height].y - 48;
+            sprite.x = prevElemOffset + 10;
 
-            sprite.y = 500 - 24;
+            this.add.text(sprite.x, sprite.y - 24, elem.name ?? elem.id, { fontSize: '20px', fill: '#000' });
+
+            sprite.setOrigin(0, 0);
+            sprites.push(sprite)
 
             console.log(`Display: ${sprite.displayWidth}\nactual: ${sprite.width}`)
         }
-        player = this.physics.add.sprite(0, 500 - 24, 'dude');
-        ground = this.add.tileSprite(-100, 500, currentWidth, 64, 'sky');
+        player = this.physics.add.sprite(0, groundLevel - 24, 'dude');
+        ground = this.add.tileSprite(-100, groundLevel, currentWidth, 64, 'sky');
 
         this.physics.add.existing(ground);
 
@@ -73,7 +79,7 @@ const StartGame = (parent) => {
         player.setBounce(0.2);
 
         camera.startFollow(player);
-        camera.setFollowOffset(-currentWidth / 2 + 100, 200);
+        camera.setFollowOffset(-currentWidth / 2 + 100, playerOffsetY);
 
         this.anims.create({
             key: 'left',
