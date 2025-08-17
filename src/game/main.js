@@ -57,7 +57,6 @@ const StartGame = (parent) => {
         clouds = this.add.tileSprite(-100, -300, currentWidth, currentHeight, 'clouds');
         clouds.scaleX = clouds.scaleY;
         ground = this.physics.add.group();
-        player = this.physics.add.sprite(0, groundLevel - 24, 'dude');
         for (let index = 0; index < envObjects.length; index++) {
             const elem = envObjects[index];
             var sprite = this.add.sprite(0, 0, elem.id);
@@ -80,6 +79,7 @@ const StartGame = (parent) => {
             sprite.body.immovable = true;
             sprite.body.allowGravity = false;
         }
+        player = this.physics.add.sprite(0, groundLevel - 24, 'dude');
         this.physics.add.existing(clouds);
         clouds.body.immovable = true;
         clouds.body.allowGravity = false;
