@@ -49,16 +49,20 @@ const StartGame = (parent) => {
         );
     }
 
-    var player, ground_top, ground_bottom, sprites = [];
+    var player, ground, ground, velocity = 160, lastSprite;
     function create() {
         var camera = this.cameras.main;
+        var spriteGroup = this.physics.add.group();
+        ground = this.physics.add.group();
+        player = this.physics.add.sprite(0, groundLevel - 24, 'dude');
         for (let index = 0; index < envObjects.length; index++) {
             const elem = envObjects[index];
-
             var sprite = this.add.sprite(0, 0, elem.id);
+
             sprite.displayHeight = 48; // Sets the display width to 200 pixels
             sprite.scaleX = sprite.scaleY; // Adjusts the height to maintain aspect ratio
-            var prevElemOffset = (sprites.length) ? (sprites[sprites.length - 1].x + sprites[sprites.length - 1].displayWidth) : 10;
+
+            var prevElemOffset = lastSprite ? lastSprite.x + lastSprite.displayWidth : 10;
 
             sprite.y = posPresets[elem.height].y - 48;
             sprite.x = prevElemOffset + 20;
@@ -66,27 +70,27 @@ const StartGame = (parent) => {
             var text = this.add.text(sprite.x + 4, sprite.y - 24 - 3, elem.name ?? elem.id, { fontSize: '20px', fill: '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
             text.setWordWrapCallback((txt, elem) => { if (elem.width + 10 < sprite.displayWidth) { elem.y -= 24; return txt.split(" "); } return txt; })
 
+            lastSprite = sprite;
+            spriteGroup.add(sprite);
+
             sprite.setOrigin(0, 0);
-            sprites.push(sprite)
-
-            console.log(`Display: ${sprite.displayWidth}\nactual: ${sprite.width}`)
+            sprite.body.immovable = true;
+            sprite.body.allowGravity = false;
         }
-        player = this.physics.add.sprite(0, groundLevel - 24, 'dude');
-        ground_top = this.add.tileSprite(-100, groundLevel, currentWidth, 64, 'ground_top');
-        ground_bottom = this.add.tileSprite(-100, groundLevel + 64, currentWidth, currentWidth / 2 - playerOffsetY, 'ground_bottom');
+        player.setCollideWorldBounds();
+        this.physics.world.setBounds(-100, 0, lastSprite.x + lastSprite.displayWidth + 50 + 100);
 
-        this.physics.add.existing(ground_top);
-        this.physics.add.existing(ground_bottom);
+        var ground_top = this.add.tileSprite(-100, groundLevel, currentWidth, 64, 'ground_top');
+        var ground_bottom = this.add.tileSprite(-100, groundLevel + 64, currentWidth, currentWidth / 2 - playerOffsetY, 'ground_bottom');
 
-        ground_top.setOrigin(0, 0);
-        ground_top.body.immovable = true;
-        ground_top.body.allowGravity = false;
-        ground_top.body.setFriction(0, 0);
+        ground.add(ground_top);
+        ground.add(ground_bottom);
 
-        ground_bottom.setOrigin(0, 0);
-        ground_bottom.body.immovable = true;
-        ground_bottom.body.allowGravity = false;
-        ground_bottom.body.setFriction(0, 0);
+        ground.children.entries.forEach((elem) => {
+            elem.setOrigin(0, 0);
+            elem.body.immovable = true;
+            elem.body.allowGravity = false;
+        });
 
         player.setBounce(0.2);
 
@@ -112,35 +116,29 @@ const StartGame = (parent) => {
             frameRate: 10,
             repeat: -1
         });
-        this.physics.add.collider(player, ground_top);
+        this.physics.add.collider(player, spriteGroup);
+        this.physics.add.collider(player, ground);
     }
     var cursors;
     function update() {
         cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown) {
-            player.setVelocityX(-160);
-            ground_top.body.setVelocityX(-160);
-            ground_bottom.body.setVelocityX(-160);
-            ground_top.tilePositionX -= 2.7;
+            player.setVelocityX(-velocity);
             player.anims.play('left', true);
         }
         else if (cursors.right.isDown) {
-            player.setVelocityX(160);
-            ground_top.body.setVelocityX(160);
-            ground_top.tilePositionX += 2.7;
-            ground_bottom.body.setVelocityX(160);
+            player.setVelocityX(velocity);
             player.anims.play('right', true);
         }
         else {
             player.setVelocityX(0);
-            ground_top.body.setVelocityX(0);
-            ground_bottom.body.setVelocityX(0);
             player.anims.play('turn');
         }
 
         if (cursors.up.isDown && player.body.touching.down) {
-            player.setVelocityY(-130);
+            player.setVelocityY(-230);
         }
+        ground.children.entries.forEach((elem) => { elem.tilePositionX += player.x - 100 - elem.x; elem.x = player.x - 100; });
     }
     return new Game({ ...config }, parent);
 }
