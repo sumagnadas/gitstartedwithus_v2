@@ -13,7 +13,7 @@ const StartGame = (parent) => {
         width: currentWidth,
         height: currentHeight,
         parent: parent,
-        backgroundColor: '#565656',
+        backgroundColor: '#00a8ff',
         physics: {
             default: 'arcade',
             arcade: {
@@ -43,16 +43,19 @@ const StartGame = (parent) => {
         this.load.image('star', 'assets/star.png');
         this.load.image('bomb', 'assets/bomb.png');
         this.load.image('bench', 'assets/bench.png');
+        this.load.image('clouds', 'assets/clouds.png');
         this.load.spritesheet('dude',
             'assets/dude.png',
             { frameWidth: 32, frameHeight: 48 }
         );
     }
 
-    var player, ground, ground, velocity = 160, lastSprite;
+    var player, ground, ground, velocity = 160, lastSprite, clouds;
     function create() {
         var camera = this.cameras.main;
         var spriteGroup = this.physics.add.group();
+        clouds = this.add.tileSprite(-100, -300, currentWidth, currentHeight, 'clouds');
+        clouds.scaleX = clouds.scaleY;
         ground = this.physics.add.group();
         player = this.physics.add.sprite(0, groundLevel - 24, 'dude');
         for (let index = 0; index < envObjects.length; index++) {
@@ -77,12 +80,15 @@ const StartGame = (parent) => {
             sprite.body.immovable = true;
             sprite.body.allowGravity = false;
         }
+        this.physics.add.existing(clouds);
+        clouds.body.immovable = true;
+        clouds.body.allowGravity = false;
         player.setCollideWorldBounds();
         this.physics.world.setBounds(-100, 0, lastSprite.x + lastSprite.displayWidth + 50 + 100);
 
         var ground_top = this.add.tileSprite(-100, groundLevel, currentWidth, 64, 'ground_top');
-        var ground_bottom = this.add.tileSprite(-100, groundLevel + 64, currentWidth, currentWidth / 2 - playerOffsetY, 'ground_bottom');
-
+        var ground_bottom = this.add.tileSprite(-100, groundLevel + 64, currentWidth, currentHeight / 2 - playerOffsetY, 'ground_bottom');
+        clouds.setOrigin(0, 0);
         ground.add(ground_top);
         ground.add(ground_bottom);
 
@@ -121,12 +127,14 @@ const StartGame = (parent) => {
     }
     var cursors;
     function update() {
+        clouds.tilePositionX += 2;
         cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown) {
             player.setVelocityX(-velocity);
             player.anims.play('left', true);
         }
         else if (cursors.right.isDown) {
+            clouds.tilePositionX += player.x - 100 - clouds.x;
             player.setVelocityX(velocity);
             player.anims.play('right', true);
         }
@@ -138,6 +146,7 @@ const StartGame = (parent) => {
         if (cursors.up.isDown && player.body.touching.down) {
             player.setVelocityY(-230);
         }
+        clouds.x = player.x - 100;
         ground.children.entries.forEach((elem) => { elem.tilePositionX += player.x - 100 - elem.x; elem.x = player.x - 100; });
     }
     return new Game({ ...config }, parent);
