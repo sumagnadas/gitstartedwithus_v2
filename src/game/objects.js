@@ -12,8 +12,7 @@ var envObjects = [
     {
         id: 'star',
         x: 125,
-        y: 200
-        , height: 'bottom'
+        y: 200, height: 'bottom'
     },
     { id: 'bench', x: 600, height: 'bottom', name: 'Sumagna Das' },
     { id: 'bench', height: 'top', name: 'Sumagna Das' },
