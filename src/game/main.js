@@ -2,12 +2,12 @@ import { AUTO, Game } from 'phaser';
 import envObjects from './objects';
 
 const StartGame = (parent) => {
-    var groundLevel = 500, playerOffsetY = 100;
-    var posPresets = { 'top': { y: 100 }, 'middle': { y: 250 }, 'bottom': { y: groundLevel } }
     // var currentWidth = 800;
     var currentWidth = window.innerWidth;
     // var currentHeight = 600;
     var currentHeight = window.innerHeight;
+    var groundLevel = currentHeight / 2, playerOffsetY = currentWidth / 10;
+    var posPresets = { 'top': { y: 0 }, 'middle': { y: (currentHeight - groundLevel) / 2 }, 'bottom': { y: groundLevel } }
     var config = {
         type: AUTO,
         width: currentWidth,
@@ -23,6 +23,9 @@ const StartGame = (parent) => {
         },
         audio: {
             noAudio: true,
+        },
+        input: {
+            activePointers: 2,
         },
         // scale: {
         //     mode: Phaser.Scale.FIT,
@@ -50,7 +53,7 @@ const StartGame = (parent) => {
         );
     }
 
-    var player, ground, ground, velocity = 160, lastSprite, clouds;
+    var player, ground, ground, velocity = 160, lastSprite, clouds, isRight = false, isLeft = false;
     function create() {
         var camera = this.cameras.main;
         var spriteGroup = this.physics.add.group();
@@ -124,16 +127,55 @@ const StartGame = (parent) => {
         });
         this.physics.add.collider(player, spriteGroup);
         this.physics.add.collider(player, ground);
+        player.anims.play('turn');
+        if (this.sys.game.device.input.touch) {
+            var leftButton = this.add.rectangle(0, 0, 100, currentHeight, 0xFF0000, 0);
+            leftButton.setOrigin(0, 0);
+            leftButton.setScrollFactor(0, 0);
+            leftButton.setInteractive();
+            leftButton.on('pointerdown', () => { isLeft = true; })
+            leftButton.on('pointerup', () => { isLeft = false; })
+            leftButton.on('pointerout', () => { isLeft = false; })
+
+            var rightButton = this.add.rectangle(currentWidth - 100, 0, 100, currentHeight, 0xFF0000, 0);
+            rightButton.setOrigin(0, 0);
+            rightButton.setScrollFactor(0, 0);
+            rightButton.setInteractive();
+            rightButton.on('pointerdown', () => { isRight = true; })
+            rightButton.on('pointerup', () => { isRight = false; })
+            rightButton.on('pointerout', () => { isRight = false; })
+
+            var midArea = this.add.rectangle(100, currentHeight / 3, currentWidth - 200, currentHeight / 2, 0xFF0000, 0);
+            midArea.setOrigin(0, 0)
+            midArea.setScrollFactor(0, 0);
+            midArea.setInteractive();
+            var jumpX, jumpY;
+            midArea.on('pointerdown', (p, x, y) => { jumpX = x; jumpY = y; });
+            midArea.on('pointermove', (p, x, y) => {
+                if (player.body.touching.down) {
+                    if ((y - jumpY) <= -48 * 2) {
+                        player.setVelocityY(-230);
+                    }
+                };
+            });
+        }
     }
-    var cursors;
     function update() {
         clouds.tilePositionX += 2;
-        cursors = this.input.keyboard.createCursorKeys();
-        if (cursors.left.isDown) {
+        if (!this.sys.game.device.input.touch) {
+            var cursors = this.input.keyboard.createCursorKeys();
+            isLeft = cursors.left.isDown;
+            isRight = cursors.right.isDown;
+            if (cursors.up.isDown && player.body.touching.down) {
+                player.setVelocityY(-230);
+            }
+        }
+
+        if (isLeft) {
             player.setVelocityX(-velocity);
             player.anims.play('left', true);
         }
-        else if (cursors.right.isDown) {
+        else if (isRight) {
             clouds.tilePositionX += player.x - 100 - clouds.x;
             player.setVelocityX(velocity);
             player.anims.play('right', true);
@@ -141,10 +183,6 @@ const StartGame = (parent) => {
         else {
             player.setVelocityX(0);
             player.anims.play('turn');
-        }
-
-        if (cursors.up.isDown && player.body.touching.down) {
-            player.setVelocityY(-230);
         }
         clouds.x = player.x - 100;
         ground.children.entries.forEach((elem) => { elem.tilePositionX += player.x - 100 - elem.x; elem.x = player.x - 100; });
