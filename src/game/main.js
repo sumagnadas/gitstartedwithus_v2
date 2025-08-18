@@ -2,12 +2,12 @@ import { AUTO, Game } from 'phaser';
 import envObjects from './objects';
 
 const StartGame = (parent) => {
-    // var currentWidth = 800;
     var currentWidth = window.innerWidth;
-    // var currentHeight = 600;
     var currentHeight = window.innerHeight;
-    var groundLevel = currentHeight / 2, playerOffsetY = currentWidth / 10;
+
+    var groundLevel = currentHeight / 2, playerOffsetY = currentHeight / 5, playerOffsetX;
     var posPresets = { 'top': { y: 0 }, 'middle': { y: (currentHeight - groundLevel) / 2 }, 'bottom': { y: groundLevel } }
+
     var config = {
         type: AUTO,
         width: currentWidth,
@@ -55,9 +55,10 @@ const StartGame = (parent) => {
 
     var player, ground, ground, velocity = 160, lastSprite, clouds, isRight = false, isLeft = false;
     function create() {
+        playerOffsetX = (this.sys.game.device.input.touch) ? currentWidth / 4 : currentWidth / 10;
         var camera = this.cameras.main;
         var spriteGroup = this.physics.add.group();
-        clouds = this.add.tileSprite(-100, -300, currentWidth, currentHeight, 'clouds');
+        clouds = this.add.tileSprite(-playerOffsetX, -300, currentWidth, currentHeight, 'clouds');
         clouds.scaleX = clouds.scaleY;
         ground = this.physics.add.group();
         for (let index = 0; index < envObjects.length; index++) {
@@ -87,10 +88,10 @@ const StartGame = (parent) => {
         clouds.body.immovable = true;
         clouds.body.allowGravity = false;
         player.setCollideWorldBounds();
-        this.physics.world.setBounds(-100, 0, lastSprite.x + lastSprite.displayWidth + 50 + 100);
+        this.physics.world.setBounds(-playerOffsetX, 0, lastSprite.x + lastSprite.displayWidth + 50 + playerOffsetX);
 
-        var ground_top = this.add.tileSprite(-100, groundLevel, currentWidth, 64, 'ground_top');
-        var ground_bottom = this.add.tileSprite(-100, groundLevel + 64, currentWidth, currentHeight / 2 - playerOffsetY, 'ground_bottom');
+        var ground_top = this.add.tileSprite(-playerOffsetX, groundLevel, currentWidth, 64, 'ground_top');
+        var ground_bottom = this.add.tileSprite(-playerOffsetX, groundLevel + 64, currentWidth, currentHeight / 2 - playerOffsetY, 'ground_bottom');
         clouds.setOrigin(0, 0);
         ground.add(ground_top);
         ground.add(ground_bottom);
@@ -104,7 +105,7 @@ const StartGame = (parent) => {
         player.setBounce(0.2);
 
         camera.startFollow(player);
-        camera.setFollowOffset(-currentWidth / 2 + 100, playerOffsetY);
+        camera.setFollowOffset(-currentWidth / 2 + playerOffsetX, playerOffsetY);
 
         this.anims.create({
             key: 'left',
@@ -129,7 +130,7 @@ const StartGame = (parent) => {
         this.physics.add.collider(player, ground);
         player.anims.play('turn');
         if (this.sys.game.device.input.touch) {
-            var leftButton = this.add.rectangle(0, 0, 100, currentHeight, 0xFF0000, 0);
+            var leftButton = this.add.rectangle(0, 0, playerOffsetX, currentHeight, 0xFF0000, 0);
             leftButton.setOrigin(0, 0);
             leftButton.setScrollFactor(0, 0);
             leftButton.setInteractive();
@@ -137,7 +138,7 @@ const StartGame = (parent) => {
             leftButton.on('pointerup', () => { isLeft = false; })
             leftButton.on('pointerout', () => { isLeft = false; })
 
-            var rightButton = this.add.rectangle(currentWidth - 100, 0, 100, currentHeight, 0xFF0000, 0);
+            var rightButton = this.add.rectangle(currentWidth - playerOffsetX, 0, playerOffsetX, currentHeight, 0xFF0000, 0);
             rightButton.setOrigin(0, 0);
             rightButton.setScrollFactor(0, 0);
             rightButton.setInteractive();
@@ -145,7 +146,7 @@ const StartGame = (parent) => {
             rightButton.on('pointerup', () => { isRight = false; })
             rightButton.on('pointerout', () => { isRight = false; })
 
-            var midArea = this.add.rectangle(100, currentHeight / 3, currentWidth - 200, currentHeight / 2, 0xFF0000, 0);
+            var midArea = this.add.rectangle(playerOffsetX, currentHeight / 3, currentWidth - 200, currentHeight / 2, 0xFF0000, 0);
             midArea.setOrigin(0, 0)
             midArea.setScrollFactor(0, 0);
             midArea.setInteractive();
@@ -176,7 +177,7 @@ const StartGame = (parent) => {
             player.anims.play('left', true);
         }
         else if (isRight) {
-            clouds.tilePositionX += player.x - 100 - clouds.x;
+            clouds.tilePositionX += player.x - playerOffsetX - clouds.x;
             player.setVelocityX(velocity);
             player.anims.play('right', true);
         }
@@ -184,8 +185,8 @@ const StartGame = (parent) => {
             player.setVelocityX(0);
             player.anims.play('turn');
         }
-        clouds.x = player.x - 100;
-        ground.children.entries.forEach((elem) => { elem.tilePositionX += player.x - 100 - elem.x; elem.x = player.x - 100; });
+        clouds.x = player.x - playerOffsetX;
+        ground.children.entries.forEach((elem) => { elem.tilePositionX += player.x - playerOffsetX - elem.x; elem.x = player.x - playerOffsetX; });
     }
     return new Game({ ...config }, parent);
 }
