@@ -85,11 +85,12 @@ const StartGame = (parent) => {
             text.setWordWrapCallback((txt, elem) => { if (elem.width + 10 < sprite.displayWidth) { var words = txt.split(" "); elem.y -= 24 * (words.length - 1); return words; } return txt; })
 
             lastSprite = sprite;
-            spriteGroup.add(sprite);
-
             sprite.setOrigin(0, 0);
+            if ((elem.z_pos ?? "player") == "player") {
+                spriteGroup.add(sprite);
             sprite.body.immovable = true;
             sprite.body.allowGravity = false;
+            }
         }
         player = this.physics.add.sprite(0, groundLevel - 24, 'dude');
         this.physics.add.existing(clouds);
