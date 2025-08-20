@@ -27,10 +27,10 @@ const StartGame = (parent) => {
         input: {
             activePointers: 2,
         },
-        // scale: {
-        //     mode: Phaser.Scale.FIT,
-        //     autoCenter: Phaser.Scale.CENTER_BOTH
-        // },
+        scale: {
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH
+        },
         scene: {
             preload: preload,
             create: create,
