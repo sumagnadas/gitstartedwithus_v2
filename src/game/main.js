@@ -1,7 +1,7 @@
 import { AUTO, Game } from 'phaser';
-import envObjects from './objects';
 
 const StartGame = (parent) => {
+    var year = 2025, envObjects;
     var currentWidth = window.innerWidth;
     var currentHeight = window.innerHeight;
 
@@ -40,15 +40,23 @@ const StartGame = (parent) => {
 
 
     function preload() {
-        this.load.image('sky', 'assets/sky.png');
-        this.load.image('ground_top', 'assets/ground_top.png');
-        this.load.image('ground_bottom', 'assets/ground_bottom.png');
-        this.load.image('star', 'assets/star.png');
-        this.load.image('bomb', 'assets/bomb.png');
-        this.load.image('bench', 'assets/bench.png');
-        this.load.image('clouds', 'assets/clouds.png');
+        this.load.setPath(`assets`);
+        import(`./objects/${year}/object_schema.js`).then((module) => {
+            const objectSchema = module.default;
+            for (let index = 0; index < objectSchema.length; index++) {
+                var obj = objectSchema[index];
+                this.load.image(obj.id, `${year}/${obj.filename ?? `${obj.id}.png`}`)
+            }
+        });
+        import(`./objects/${year}/objects.js`).then((module) => {
+            envObjects = module.default;
+        });
+        this.load.image('sky', 'sky.png');
+        this.load.image('ground_top', 'ground_top.png');
+        this.load.image('ground_bottom', 'ground_bottom.png');
+        this.load.image('clouds', 'clouds.png');
         this.load.spritesheet('dude',
-            'assets/dude.png',
+            'dude.png',
             { frameWidth: 32, frameHeight: 48 }
         );
     }

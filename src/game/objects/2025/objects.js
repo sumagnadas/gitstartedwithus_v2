@@ -16,6 +16,6 @@ var envObjects = [
     },
     { id: 'bench', x: 600, height: 'bottom', name: 'Sumagna Das' },
     { id: 'bench', height: 'top', name: 'Sumagna Das' },
-    { id: 'bench', height: 'bottom', name: 'Sumagna Das' }
+    { id: 'bench', height: 'bottom', name: 'Ashish Kumar Dash' }
 ];
 export default envObjects;
