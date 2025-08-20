@@ -74,7 +74,7 @@ const StartGame = (parent) => {
             sprite.x = prevElemOffset + 20;
 
             var text = this.add.text(sprite.x + 4, sprite.y - 24 - 3, elem.name ?? elem.id, { fontSize: '20px', fill: '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
-            text.setWordWrapCallback((txt, elem) => { if (elem.width + 10 < sprite.displayWidth) { elem.y -= 24; return txt.split(" "); } return txt; })
+            text.setWordWrapCallback((txt, elem) => { if (elem.width + 10 < sprite.displayWidth) { var words = txt.split(" "); elem.y -= 24 * (words.length - 1); return words; } return txt; })
 
             lastSprite = sprite;
             spriteGroup.add(sprite);
