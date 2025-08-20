@@ -10,12 +10,10 @@ var envObjects = [
         y: 100, height: 'middle'
     },
     {
-        id: 'star',
-        x: 125,
-        y: 200, height: 'bottom'
+        id: 'star', height: 'bottom'
     },
-    { id: 'bench', x: 600, height: 'bottom', name: 'Sumagna Das' },
+    { id: 'bench', height: 'bottom', name: 'Sumagna Das' },
     { id: 'bench', height: 'top', name: 'Sumagna Das' },
-    { id: 'bench', height: 'bottom', name: 'Ashish Kumar Dash' }
+    { id: 'bench', height: 'bottom', name: 'Ashish Kumar Dash', color: '#0aed0aff', githubId: 'ashish-kumar-dash', z_pos: 'behind' },
 ];
 export default envObjects;
