@@ -81,15 +81,24 @@ const StartGame = (parent) => {
             sprite.y = posPresets[elem.height].y - 48;
             sprite.x = prevElemOffset + 20;
 
-            var text = this.add.text(sprite.x + 4, sprite.y - 24 - 3, elem.name ?? elem.id, { fontSize: '20px', fill: '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
-            text.setWordWrapCallback((txt, elem) => { if (elem.width + 10 < sprite.displayWidth) { var words = txt.split(" "); elem.y -= 24 * (words.length - 1); return words; } return txt; })
-
+            var text = this.add.text(sprite.x + 4, sprite.y - 24 - 3, elem.name ?? elem.id, { fontSize: '20px', fill: elem.color ?? '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
+            text.wrapped = false;
+            text.setWordWrapCallback((txt, elem) => { if (elem.width + 10 < sprite.displayWidth) { var words = txt.split(" "); if (!text.wrapped) { elem.y -= 24 * (words.length - 1); text.wrapped = true; } return words; } return txt; })
+            text.setInteractive();
+            if (elem.githubId) {
+                text.on('pointerdown', () => { open(`https://www.github.com/${elem.githubId}`) })
+                text.on('pointermove', () => {
+                    text.setFontStyle('bold');
+                    document.body.style.cursor = 'pointer';
+                })
+                text.on('pointerout', () => { text.setFontStyle('normal'); document.body.style.cursor = 'auto'; })
+            }
             lastSprite = sprite;
             sprite.setOrigin(0, 0);
             if ((elem.z_pos ?? "player") == "player") {
                 spriteGroup.add(sprite);
-            sprite.body.immovable = true;
-            sprite.body.allowGravity = false;
+                sprite.body.immovable = true;
+                sprite.body.allowGravity = false;
             }
         }
         player = this.physics.add.sprite(0, groundLevel - 24, 'dude');
