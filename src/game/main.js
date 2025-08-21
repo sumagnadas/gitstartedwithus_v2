@@ -17,7 +17,7 @@ const StartGame = (parent) => {
         physics: {
             default: 'arcade',
             arcade: {
-                gravity: { y: 300 },
+                gravity: { y: 700 },
                 debug: false
             }
         },
@@ -37,8 +37,7 @@ const StartGame = (parent) => {
             update: update
         }
     };
-
-
+    var playerHeight = 40;
     function preload() {
         this.load.setPath(`assets`);
         import(`./objects/${year}/object_schema.js`).then((module) => {
@@ -55,9 +54,18 @@ const StartGame = (parent) => {
         this.load.image('ground_top', 'ground_top.png');
         this.load.image('ground_bottom', 'ground_bottom.png');
         this.load.image('clouds', 'clouds.png');
-        this.load.spritesheet('dude',
-            'dude.png',
-            { frameWidth: 32, frameHeight: 48 }
+
+        this.load.spritesheet('pikachu_jump',
+            'pikachu_jump.png',
+            { frameWidth: 38, frameHeight: 56 }
+        );
+        this.load.spritesheet('pikachu_walk',
+            'pikachu_walk.png',
+            { frameWidth: 44, frameHeight: playerHeight }
+        );
+        this.load.spritesheet('pikachu_run',
+            'pikachu_run.png',
+            { frameWidth: 77, frameHeight: playerHeight }
         );
     }
 
@@ -66,24 +74,33 @@ const StartGame = (parent) => {
         playerOffsetX = (this.sys.game.device.input.touch) ? currentWidth / 4 : currentWidth / 10;
         var camera = this.cameras.main;
         var spriteGroup = this.physics.add.group();
-        clouds = this.add.tileSprite(-playerOffsetX, -300, currentWidth, currentHeight, 'clouds');
+        clouds = this.add.tileSprite(-playerOffsetX, -currentHeight / 3, currentWidth, currentHeight, 'clouds');
         clouds.scaleX = clouds.scaleY;
         ground = this.physics.add.group();
         for (let index = 0; index < envObjects.length; index++) {
             const elem = envObjects[index];
             var sprite = this.add.sprite(0, 0, elem.id);
 
-            sprite.displayHeight = 48; // Sets the display width to 200 pixels
+            sprite.displayHeight = playerHeight; // Sets the display width to 200 pixels
             sprite.scaleX = sprite.scaleY; // Adjusts the height to maintain aspect ratio
 
             var prevElemOffset = lastSprite ? lastSprite.x + lastSprite.displayWidth : 10;
 
-            sprite.y = posPresets[elem.height].y - 48;
-            sprite.x = prevElemOffset + 20;
+            sprite.y = posPresets[elem.height].y - playerHeight;
+            sprite.x = prevElemOffset + 30;
 
-            var text = this.add.text(sprite.x + 4, sprite.y - 24 - 3, elem.name ?? elem.id, { fontSize: '20px', fill: elem.color ?? '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
+            var text = this.add.text(sprite.x + 4, sprite.y - 3 * playerHeight / 4, elem.name ?? elem.id, { fontSize: '20px', fill: elem.color ?? '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
             text.wrapped = false;
-            text.setWordWrapCallback((txt, elem) => { if (elem.width + 10 < sprite.displayWidth) { var words = txt.split(" "); if (!text.wrapped) { elem.y -= 24 * (words.length - 1); text.wrapped = true; } return words; } return txt; })
+            text.setWordWrapCallback((txt, elem) => {
+                if (elem.width + 10 > sprite.displayWidth) {
+                    var words = txt.split(" ");
+                    if (!text.wrapped) {
+                        elem.y -= playerHeight / 2 * (words.length - 1);
+                        text.wrapped = true;
+                    }
+                    return words;
+                } return txt;
+            })
             text.setInteractive();
             if (elem.githubId) {
                 text.on('pointerdown', () => { open(`https://www.github.com/${elem.githubId}`) })
@@ -101,7 +118,7 @@ const StartGame = (parent) => {
                 sprite.body.allowGravity = false;
             }
         }
-        player = this.physics.add.sprite(0, groundLevel - 24, 'dude');
+        player = this.physics.add.sprite(0, groundLevel - playerHeight / 2, 'pikachu_walk');
         this.physics.add.existing(clouds);
         clouds.body.immovable = true;
         clouds.body.allowGravity = false;
@@ -127,26 +144,31 @@ const StartGame = (parent) => {
 
         this.anims.create({
             key: 'left',
-            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+            frames: this.anims.generateFrameNumbers('pikachu_run', { start: 0, end: 3 }),
             frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
-            key: 'turn',
-            frames: [{ key: 'dude', frame: 4 }],
+            key: 'idle',
+            frames: [{ key: 'pikachu_walk', frame: 0 }],
+            frameRate: 20
+        });
+        this.anims.create({
+            key: 'jump',
+            frames: [{ key: 'pikachu_jump', frame: 0 }],
             frameRate: 20
         });
 
         this.anims.create({
             key: 'right',
-            frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+            frames: this.anims.generateFrameNumbers('pikachu_run', { start: 0, end: 3 }),
             frameRate: 10,
             repeat: -1
         });
         this.physics.add.collider(player, spriteGroup);
         this.physics.add.collider(player, ground);
-        player.anims.play('turn');
+        player.anims.play('idle');
         if (this.sys.game.device.input.touch) {
             var leftButton = this.add.rectangle(0, 0, playerOffsetX, currentHeight, 0xFF0000, 0);
             leftButton.setOrigin(0, 0);
@@ -168,12 +190,15 @@ const StartGame = (parent) => {
             midArea.setOrigin(0, 0)
             midArea.setScrollFactor(0, 0);
             midArea.setInteractive();
-            var jumpX, jumpY;
-            midArea.on('pointerdown', (p, x, y) => { jumpX = x; jumpY = y; });
+            var jumpY;
+            midArea.on('pointerdown', (p, x, y) => { jumpY = y; });
             midArea.on('pointermove', (p, x, y) => {
                 if (player.body.touching.down) {
-                    if ((y - jumpY) <= -48 * 2) {
-                        player.setVelocityY(-230);
+                    if ((y - jumpY) <= -playerHeight * 2) {
+                        player.setVelocityY(-300);
+                        player.anims.play('jump', true);
+                        player.body.setSize(38);
+
                     }
                 };
             });
@@ -186,22 +211,38 @@ const StartGame = (parent) => {
             isLeft = cursors.left.isDown;
             isRight = cursors.right.isDown;
             if (cursors.up.isDown && player.body.touching.down) {
-                player.setVelocityY(-230);
+                player.setVelocityY(-300);
+                player.anims.play('jump', true);
+                player.body.setSize(38);
+
             }
         }
 
         if (isLeft) {
+            player.flipX = true;
             player.setVelocityX(-velocity);
             player.anims.play('left', true);
+            player.body.setSize(77);
         }
         else if (isRight) {
+            player.flipX = false;
             clouds.tilePositionX += player.x - playerOffsetX - clouds.x;
             player.setVelocityX(velocity);
             player.anims.play('right', true);
+            player.body.setSize(77);
         }
         else {
             player.setVelocityX(0);
-            player.anims.play('turn');
+            if (player.anims.currentAnim.key != "jump") {
+                player.body.setSize(44);
+                player.anims.play('idle');
+            }
+            else {
+                if (player.body.velocity.y > 200) {
+                    player.body.setSize(44);
+                    player.anims.play('idle');
+                }
+            }
         }
         clouds.x = player.x - playerOffsetX;
         ground.children.entries.forEach((elem) => { elem.tilePositionX += player.x - playerOffsetX - elem.x; elem.x = player.x - playerOffsetX; });
