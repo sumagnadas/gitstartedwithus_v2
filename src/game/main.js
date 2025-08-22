@@ -119,7 +119,6 @@ const StartGame = (parent) => {
         this.physics.add.existing(clouds);
         clouds.body.immovable = true;
         clouds.body.allowGravity = false;
-        player.setCollideWorldBounds();
         this.physics.world.setBounds(-playerOffsetX, -400, lastSprite.x + lastSprite.displayWidth + 50 + playerOffsetX, currentHeight + 300);
 
         var ground_top = this.add.tileSprite(-playerOffsetX, groundLevel, currentWidth, 64, 'ground_top');
