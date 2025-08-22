@@ -39,15 +39,13 @@ const StartGame = (parent) => {
     };
     var playerHeight = 40;
     function preload() {
+        const modules = import.meta.glob("./objects/**/*.js");
+        var object_schema_promis = modules["./objects/" + year + "/object_schema.js"]();
+        object_schema_promis.then((data) => { data.default.map((obj) => { this.load.image(obj.id, `${year}/${obj.filename ?? `${obj.id}.png`}`) }) })
+        var env_objects_promise = modules[`./objects/${year}/objects.js`]();
+        env_objects_promise.then((data) => { envObjects = data.default; });
+
         this.load.setPath(`assets`);
-        this.load.script('objectSchema', `../src/game/objects/${year}/object_schema.js`)
-        this.load.script('envObjects', `../src/game/objects/${year}/objects.js`)
-        this.load.once('filecomplete-script-objectSchema', () => {
-            objectSchema.map((obj) => { this.load.image(obj.id, `${year}/${obj.filename ?? `${obj.id}.png`}`) })
-        })
-        this.load.once('filecomplete-script-envObjects', () => {
-            envObjects = globalThis.envObjects;
-        })
         this.load.image('sky', 'sky.png');
         this.load.image('ground_top', 'ground_top.png');
         this.load.image('ground_bottom', 'ground_bottom.png');

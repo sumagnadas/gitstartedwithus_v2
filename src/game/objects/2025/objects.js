@@ -17,3 +17,4 @@ var envObjects = [
     { id: 'bench', height: 'top', name: 'Sumagna Das' },
 ];
 Object.keys(objects).forEach((key) => { var promise = objects[key](); promise.then((data) => { envObjects.push(data.default) }) });
+export default envObjects;
