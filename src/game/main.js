@@ -51,6 +51,8 @@ const StartGame = (parent) => {
         this.load.image('ground_top', 'ground_top.png');
         this.load.image('ground_bottom', 'ground_bottom.png');
         this.load.image('clouds', 'clouds.png');
+        this.load.image('arrow', 'arrow.png');
+        this.load.image('up_arrow', 'up_arrow.png');
 
         this.load.spritesheet('pikachu_jump',
             'pikachu_jump.png',
@@ -166,7 +168,7 @@ const StartGame = (parent) => {
         this.physics.add.collider(player, ground);
         player.anims.play('idle');
         if (this.sys.game.device.input.touch) {
-            var leftButton = this.add.rectangle(0, 0, playerOffsetX, currentHeight, 0xFF0000, 0);
+            var leftButton = this.add.sprite(20, currentHeight * 4 / 5 + 50, 'arrow');
             leftButton.setOrigin(0, 0);
             leftButton.setScrollFactor(0, 0);
             leftButton.setInteractive();
@@ -174,7 +176,8 @@ const StartGame = (parent) => {
             leftButton.on('pointerup', () => { isLeft = false; })
             leftButton.on('pointerout', () => { isLeft = false; })
 
-            var rightButton = this.add.rectangle(currentWidth - playerOffsetX, 0, playerOffsetX, currentHeight, 0xFF0000, 0);
+            var rightButton = this.add.sprite(120, currentHeight * 4 / 5 + 50, 'arrow');
+            rightButton.flipX = true;
             rightButton.setOrigin(0, 0);
             rightButton.setScrollFactor(0, 0);
             rightButton.setInteractive();
@@ -182,23 +185,29 @@ const StartGame = (parent) => {
             rightButton.on('pointerup', () => { isRight = false; })
             rightButton.on('pointerout', () => { isRight = false; })
 
-            var midArea = this.add.rectangle(playerOffsetX, currentHeight / 3, currentWidth - 200, currentHeight / 2, 0xFF0000, 0);
-            midArea.setOrigin(0, 0)
-            midArea.setScrollFactor(0, 0);
-            midArea.setInteractive();
+            var jumpButton = this.add.sprite(currentWidth * 3 / 4, currentHeight * 4 / 5 + 50, 'up_arrow');
+            jumpButton.setOrigin(0, 0)
+            jumpButton.setScrollFactor(0, 0);
+            jumpButton.setInteractive();
             var jumpY;
-            midArea.on('pointerdown', (p, x, y) => { jumpY = y; });
-            midArea.on('pointermove', (p, x, y) => {
+            // jumpButton.on('pointerup', (p, x, y) => { jumpY = y; });
+            jumpButton.on('pointerdown', (p, x, y) => {
                 if (player.body.touching.down) {
-                    if ((y - jumpY) <= -playerHeight * 2) {
-                        player.setVelocityY(-370);
-                        player.anims.play('jump', true);
-                        player.body.setSize(38);
-
-                    }
+                    // leftButton.setVelocityY(370);
+                    player.setVelocityY(-370);
+                    player.anims.play('jump', true);
+                    player.body.setSize(38);
                 };
             });
+            // ground.add(leftButton);
+            // ground.add(rightButton);
+            // ground.add(jumpButton);
+            // jumpButton.body.immovable = false;
+            // jumpButton.body.allowGravity = ;
+            // leftButton.body.immovable = true;
+            // leftButton.body.allowGravity = false;
         }
+
     }
     function update() {
         clouds.tilePositionX += 2;
