@@ -1,6 +1,5 @@
 const config = {
-    id: 'grub',
-    // height: 'top',
+    id: 'flappy_bird',
     name: 'Sumagna Das',
     githubId: 'sumagnadas'
 };

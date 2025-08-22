@@ -26,5 +26,21 @@ const objectSchema = {
     'anywhere_door': {
         height: 'medium'
     },
+    'avengers_tower':
+    {
+        height: 'large',
+    },
+    'shiro':
+    {
+        height: 'medium'
+    },
+    'devil_fruit':
+    {
+        height: 'medium'
+    },
+    'arcade':
+    {
+        height: 'medium',
+    }
 };
 export default objectSchema;

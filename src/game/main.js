@@ -8,7 +8,7 @@ const StartGame = (parent) => {
 
     var groundLevel = currentHeight / 2, playerOffsetY = currentHeight / 5, playerOffsetX;
     var posPresets = { 'top': { y: 0 }, 'middle': { y: (currentHeight - groundLevel) / 2 }, 'bottom': { y: groundLevel } }
-    var htPresets = { 'large': playerHeight * 3, 'medium': playerHeight * 2, 'regular': playerHeight };
+    var htPresets = { 'large': playerHeight * 10, 'medium': playerHeight * 2, 'regular': playerHeight };
 
     var config = {
         type: AUTO,
@@ -86,10 +86,10 @@ const StartGame = (parent) => {
             sprite.y = posPresets[object_schema[elem.id].y_pos ?? 'bottom'].y - sprite.displayHeight;
             sprite.x = prevElemOffset + 30;
 
-            var text = this.add.text(sprite.x + 4, sprite.y - 3 * sprite.displayHeight / 4, elem.name ?? elem.id, { fontSize: height == 'small' ? '10px' : '20px', fill: elem.color ?? '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
+            var text = this.add.text(sprite.x + 4, sprite.y - (height != "large" ? 3 * sprite.displayHeight / 4 : sprite.displayHeight / 10), elem.name ?? elem.id, { fontSize: height == 'small' ? '10px' : '20px', fill: elem.color ?? '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
             text.wrapped = false;
             text.setWordWrapCallback((txt, elem) => {
-                if (elem.width + 10 > sprite.displayWidth) {
+                if (elem.width + 20 > sprite.displayWidth) {
                     var words = txt.split(" ");
                     if (!text.wrapped) {
                         elem.y -= sprite.displayHeight / 2 * (words.length - 1);
@@ -109,7 +109,7 @@ const StartGame = (parent) => {
             }
             lastSprite = sprite;
             sprite.setOrigin(0, 0);
-            if (((object_schema[elem.id].z_pos ?? elem.z_pos) ?? "player") == "player" || height == "large") {
+            if (((object_schema[elem.id].z_pos ?? elem.z_pos) ?? "player") == "player" && height != "large") {
                 spriteGroup.add(sprite);
                 sprite.body.immovable = true;
                 sprite.body.allowGravity = false;
