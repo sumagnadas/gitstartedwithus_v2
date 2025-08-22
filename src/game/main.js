@@ -1,7 +1,7 @@
 import { AUTO, Game } from 'phaser';
 
 const StartGame = (parent) => {
-    var year = 2025;
+    var year = 2025, envObjects;
     var currentWidth = window.innerWidth;
     var currentHeight = window.innerHeight;
 
@@ -44,6 +44,9 @@ const StartGame = (parent) => {
         this.load.script('envObjects', `../src/game/objects/${year}/objects.js`)
         this.load.once('filecomplete-script-objectSchema', () => {
             objectSchema.map((obj) => { this.load.image(obj.id, `${year}/${obj.filename ?? `${obj.id}.png`}`) })
+        })
+        this.load.once('filecomplete-script-envObjects', () => {
+            envObjects = globalThis.envObjects;
         })
         this.load.image('sky', 'sky.png');
         this.load.image('ground_top', 'ground_top.png');
