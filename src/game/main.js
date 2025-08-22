@@ -1,7 +1,7 @@
 import { AUTO, Game } from 'phaser';
 
 const StartGame = (parent) => {
-    var year = 2025, envObjects;
+    var year = 2025;
     var currentWidth = window.innerWidth;
     var currentHeight = window.innerHeight;
 
@@ -40,16 +40,11 @@ const StartGame = (parent) => {
     var playerHeight = 40;
     function preload() {
         this.load.setPath(`assets`);
-        import(`./objects/${year}/object_schema.js`).then((module) => {
-            const objectSchema = module.default;
-            for (let index = 0; index < objectSchema.length; index++) {
-                var obj = objectSchema[index];
-                this.load.image(obj.id, `${year}/${obj.filename ?? `${obj.id}.png`}`)
-            }
-        });
-        import(`./objects/${year}/objects.js`).then((module) => {
-            envObjects = module.default;
-        });
+        this.load.script('objectSchema', `../src/game/objects/${year}/object_schema.js`)
+        this.load.script('envObjects', `../src/game/objects/${year}/objects.js`)
+        this.load.once('filecomplete-script-objectSchema', () => {
+            objectSchema.map((obj) => { this.load.image(obj.id, `${year}/${obj.filename ?? `${obj.id}.png`}`) })
+        })
         this.load.image('sky', 'sky.png');
         this.load.image('ground_top', 'ground_top.png');
         this.load.image('ground_bottom', 'ground_bottom.png');
