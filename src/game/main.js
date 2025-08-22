@@ -1,12 +1,14 @@
 import { AUTO, Game } from 'phaser';
 
 const StartGame = (parent) => {
-    var year = 2025, envObjects;
+    var year = 2025, envObjects, object_schema;
     var currentWidth = window.innerWidth;
     var currentHeight = window.innerHeight;
+    var playerHeight = 40;
 
     var groundLevel = currentHeight / 2, playerOffsetY = currentHeight / 5, playerOffsetX;
     var posPresets = { 'top': { y: 0 }, 'middle': { y: (currentHeight - groundLevel) / 2 }, 'bottom': { y: groundLevel } }
+    var htPresets = { 'large': playerHeight * 3, 'medium': playerHeight * 2, 'regular': playerHeight };
 
     var config = {
         type: AUTO,
@@ -37,11 +39,10 @@ const StartGame = (parent) => {
             update: update
         }
     };
-    var playerHeight = 40;
     function preload() {
         const modules = import.meta.glob("./objects/**/*.js");
         var object_schema_promis = modules["./objects/" + year + "/object_schema.js"]();
-        object_schema_promis.then((data) => { data.default.map((obj) => { this.load.image(obj.id, `${year}/${obj.filename ?? `${obj.id}.png`}`) }) })
+        object_schema_promis.then((data) => { object_schema = data.default; Object.keys(object_schema).map((id) => { this.load.image(id, `${year}/${object_schema[id].filename ?? `${id}.png`}`) }) })
         var env_objects_promise = modules[`./objects/${year}/objects.js`]();
         env_objects_promise.then((data) => { envObjects = data.default; });
 
@@ -75,22 +76,23 @@ const StartGame = (parent) => {
         ground = this.physics.add.group();
         envObjects.sort((a, b) => (a.name > b.name)).map((elem) => {
             var sprite = this.add.sprite(0, 0, elem.id);
+            var height = object_schema[elem.id].height ?? 'regular';
 
-            sprite.displayHeight = playerHeight; // Sets the display width to 200 pixels
+            sprite.displayHeight = htPresets[height]; // Sets the display width to 200 pixels
             sprite.scaleX = sprite.scaleY; // Adjusts the height to maintain aspect ratio
 
             var prevElemOffset = lastSprite ? lastSprite.x + lastSprite.displayWidth : 10;
 
-            sprite.y = posPresets[elem.height].y - playerHeight;
+            sprite.y = posPresets[object_schema[elem.id].y_pos ?? 'bottom'].y - sprite.displayHeight;
             sprite.x = prevElemOffset + 30;
 
-            var text = this.add.text(sprite.x + 4, sprite.y - 3 * playerHeight / 4, elem.name ?? elem.id, { fontSize: '20px', fill: elem.color ?? '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
+            var text = this.add.text(sprite.x + 4, sprite.y - 3 * sprite.displayHeight / 4, elem.name ?? elem.id, { fontSize: height == 'small' ? '10px' : '20px', fill: elem.color ?? '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
             text.wrapped = false;
             text.setWordWrapCallback((txt, elem) => {
                 if (elem.width + 10 > sprite.displayWidth) {
                     var words = txt.split(" ");
                     if (!text.wrapped) {
-                        elem.y -= playerHeight / 2 * (words.length - 1);
+                        elem.y -= sprite.displayHeight / 2 * (words.length - 1);
                         text.wrapped = true;
                     }
                     return words;
@@ -107,7 +109,7 @@ const StartGame = (parent) => {
             }
             lastSprite = sprite;
             sprite.setOrigin(0, 0);
-            if ((elem.z_pos ?? "player") == "player") {
+            if (((object_schema[elem.id].z_pos ?? elem.z_pos) ?? "player") == "player" || height == "large") {
                 spriteGroup.add(sprite);
                 sprite.body.immovable = true;
                 sprite.body.allowGravity = false;
@@ -118,7 +120,7 @@ const StartGame = (parent) => {
         clouds.body.immovable = true;
         clouds.body.allowGravity = false;
         player.setCollideWorldBounds();
-        this.physics.world.setBounds(-playerOffsetX, 0, lastSprite.x + lastSprite.displayWidth + 50 + playerOffsetX);
+        this.physics.world.setBounds(-playerOffsetX, -400, lastSprite.x + lastSprite.displayWidth + 50 + playerOffsetX, currentHeight + 300);
 
         var ground_top = this.add.tileSprite(-playerOffsetX, groundLevel, currentWidth, 64, 'ground_top');
         var ground_bottom = this.add.tileSprite(-playerOffsetX, groundLevel + 64, currentWidth, currentHeight / 2 - playerOffsetY, 'ground_bottom');
@@ -190,7 +192,7 @@ const StartGame = (parent) => {
             midArea.on('pointermove', (p, x, y) => {
                 if (player.body.touching.down) {
                     if ((y - jumpY) <= -playerHeight * 2) {
-                        player.setVelocityY(-300);
+                        player.setVelocityY(-370);
                         player.anims.play('jump', true);
                         player.body.setSize(38);
 
@@ -206,7 +208,7 @@ const StartGame = (parent) => {
             isLeft = cursors.left.isDown;
             isRight = cursors.right.isDown;
             if (cursors.up.isDown && player.body.touching.down) {
-                player.setVelocityY(-300);
+                player.setVelocityY(-370);
                 player.anims.play('jump', true);
                 player.body.setSize(38);
 

@@ -1,13 +1,30 @@
-const objectSchema = [
-    {
-        id: 'bench',
+const objectSchema = {
+    'bench': {
+        height: 'regular',
+        y_pos: 'bottom'
         // filename: 'bench.png'
+        // y_pos: 'top','middle,'bottom',
+        // z_pos: 'behind', 'player',
+        // vanish: bool
+        // reset: bool
     },
-    {
-        id: 'star',
+    'flappy_bird': {
+        y_pos: 'top'
     },
-    {
-        id: 'bomb',
-    }
-];
+    'mario_pipe': {
+        height: 'medium'
+    },
+    'mario_box': {
+        y_pos: 'middle',
+        z_pos: 'player'
+    },
+    'grub': {
+        filename: 'hollow_knight_grub.png',
+        y_pos: 'bottom',
+        height: 'medium'
+    },
+    'anywhere_door': {
+        height: 'medium'
+    },
+};
 export default objectSchema;
