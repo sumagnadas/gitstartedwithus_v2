@@ -73,8 +73,7 @@ const StartGame = (parent) => {
         clouds = this.add.tileSprite(-playerOffsetX, -currentHeight / 3, currentWidth, currentHeight, 'clouds');
         clouds.scaleX = clouds.scaleY;
         ground = this.physics.add.group();
-        for (let index = 0; index < envObjects.length; index++) {
-            const elem = envObjects[index];
+        envObjects.sort((a, b) => (a.name > b.name)).map((elem) => {
             var sprite = this.add.sprite(0, 0, elem.id);
 
             sprite.displayHeight = playerHeight; // Sets the display width to 200 pixels
@@ -113,7 +112,7 @@ const StartGame = (parent) => {
                 sprite.body.immovable = true;
                 sprite.body.allowGravity = false;
             }
-        }
+        });
         player = this.physics.add.sprite(0, groundLevel - playerHeight / 2, 'pikachu_walk');
         this.physics.add.existing(clouds);
         clouds.body.immovable = true;

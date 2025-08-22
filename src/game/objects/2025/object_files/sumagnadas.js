@@ -1,2 +1,7 @@
-const sumagnadas = { id: 'bench', height: 'top', name: 'Sumagna Das' };
-export default sumagnadas;
+const config = {
+    id: 'bench',
+    height: 'top',
+    name: 'Sumagna Das',
+    githubId: 'sumagnadas'
+};
+export default config;
