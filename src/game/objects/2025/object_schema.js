@@ -41,6 +41,10 @@ const objectSchema = {
     'arcade':
     {
         height: 'medium',
+    },
+    'star':
+    {
+        height: 'medium',
     }
 };
 export default objectSchema;
