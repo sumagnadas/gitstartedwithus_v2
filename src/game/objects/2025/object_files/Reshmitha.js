@@ -1,6 +1,6 @@
 const config = {
     id: 'devil_fruit',
-    name: 'Polinedi Reshnitha',
+    name: ' Reshmitha',
     color: '#ffaa55',
     githubId: 'reshmitha',
     // z_pos: 'behind'
