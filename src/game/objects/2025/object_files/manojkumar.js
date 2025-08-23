@@ -1,5 +1,5 @@
 const config = {
-    id: 'avengers-tower',
+    id: 'avengers_tower',
     name: 'manoj kumar',
     color: '#ffaa55',
     githubId: 'manojkumar-9966',

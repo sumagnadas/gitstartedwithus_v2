@@ -1,5 +1,5 @@
 const config = {
-    id: 'hollow_knight_grub',
+    id: 'grub',
     name: 'Hemal Dedhia',
     color: '#050505',
     githubId: 'Hemal517',
