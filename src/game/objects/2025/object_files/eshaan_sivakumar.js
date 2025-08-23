@@ -1,5 +1,5 @@
 const config = {
-    id: 'star',
+    id: 'anywhere_door',
     name: 'Eshaan Sivakumar',
     color: '#ffaa55',
     githubId: 'esh-siva',

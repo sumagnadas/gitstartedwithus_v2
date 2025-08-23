@@ -1,5 +1,5 @@
 const config = {
-    id: 'star',
+    id: 'anywhere_door',
     name: 'Shivam Kumar Gupta',
     color: '#ffaa55',
     githubId: 'shivamgupta-netizen',
