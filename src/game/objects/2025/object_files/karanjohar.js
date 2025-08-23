@@ -1,5 +1,5 @@
 const config = {
-    id: 'bomb',
+    id: 'anywhere_door',
     name: 'karan johar',
     color: '#ffeebc',
     githubId: 'kamblesaanvi',

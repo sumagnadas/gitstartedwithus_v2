@@ -1,5 +1,5 @@
 const config = {
-    id: 'bomb',
+    id: 'anywhere_door',
     name: 'AryaveerSR',
     color: '#FF0000',
     githubId: 'aryaveersr',
