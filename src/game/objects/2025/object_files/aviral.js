@@ -1,5 +1,5 @@
 const config = {
-    id: 'arcade',
+    id: 'shiro',
     name: 'Aviral Saxena',
     githubId: 'aviralsaxena16',
     color: '#1326f8ff',
