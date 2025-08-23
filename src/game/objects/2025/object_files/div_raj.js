@@ -1,8 +1,8 @@
 const config = {
-    id: 'hollow_knight_grub',
+    id: 'grub',
     name: 'Divyam Raj',
     color: '#ff5555',
-    githubId: 'amay-dixit',
+    githubId: 'Divyam-sys',
     // z_pos: 'behind'
 };
 export default config;
