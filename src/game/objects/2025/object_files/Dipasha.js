@@ -1,6 +1,6 @@
 const config = {
     id: 'anywhere_door',
-    name: 'Dipa Saha,
+    name: 'Dipa Saha',
     color: '#ffaa55',
     githubId: 'dipasaha',
     // z_pos: 'behind'
