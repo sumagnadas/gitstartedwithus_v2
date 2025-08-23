@@ -86,7 +86,7 @@ const StartGame = (parent) => {
             var prevElemOffset = lastSprite ? lastSprite.x + lastSprite.displayWidth : 10;
 
             sprite.y = posPresets[object_schema[elem.id].y_pos ?? 'bottom'].y - sprite.displayHeight;
-            sprite.x = prevElemOffset + 30;
+            sprite.x = prevElemOffset + 80;
 
             var text = this.add.text(sprite.x + 4, sprite.y - (height != "large" ? 3 * sprite.displayHeight / 4 : sprite.displayHeight / 10), elem.name ?? elem.id, { fontSize: height == 'small' ? '10px' : '20px', fill: elem.color ?? '#000', align: 'center', wordWrap: { width: sprite.displayWidth, useAdvancedWrap: true } });
             text.wrapped = false;
