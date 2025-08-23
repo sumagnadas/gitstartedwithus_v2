@@ -1,6 +1,7 @@
 const config = {
-    id: 'flappy_bird',
+    id: 'grub',
     name: 'Sumagna Das',
-    githubId: 'sumagnadas'
+    githubId: 'sumagnadas',
+    color: '#1326f8ff'
 };
 export default config;
